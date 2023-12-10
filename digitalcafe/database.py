@@ -16,6 +16,30 @@ branches = {
     5: {"name":"Arcovia","phonenumber":"09179990004"},
 }
 
+users = {
+    "chums@example.com":{"password":"Ch@ng3m3!",
+                         "first_name":"Matthew",
+                         "last_name":"Uy"},
+    "joben@example.com":{"password":"Ch@ng3m3!",
+                         "first_name":"Joben",
+                         "last_name":"Ilagan"},
+    "bong@example.com":{"password":"Ch@ng3m3!",
+                        "first_name":"Bong",
+                        "last_name":"Olpoc"},
+    "joaqs@example.com":{"password":"Ch@ng3m3!",
+                         "first_name":"Joaqs",
+                         "last_name":"Gonzales"},
+    "gihoe@example.com":{"password":"Ch@ng3m3!",
+                         "first_name":"Gio",
+                         "last_name":"Hernandez"},
+    "vic@example.com":{"password":"Ch@ng3m3!",
+                       "first_name":"Vic",
+                       "last_name":"Reventar"},
+    "joe@example.com":{"password":"Ch@ng3m3!",
+                       "first_name":"Joe",
+                       "last_name":"Ilagan"},
+}
+
 def get_product(code):
     return products[code]
 
@@ -30,14 +54,20 @@ def get_products():
     return product_list
 
 def get_branch(code):
-    return branches.get(code)
+    return branches[code]
 
 def get_branches():
     branch_list = []
 
-    for code, branch in branches.items():
+    for i,v in branches.items():
         branch = v
-        branch.setdefault("code",code)
+        branch.setdefault("code",i)
         branch_list.append(branch)
 
     return branch_list
+
+def get_user(username):
+    try:
+       return users[username]
+    except KeyError:
+       return None
