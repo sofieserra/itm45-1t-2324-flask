@@ -1,11 +1,10 @@
 {% include "header.html" %}
     <h1>Branches</h1>
-
     <ul>
-        <li>Katipunan</li>
-        <li>Tomas Morato</li>
-        <li>Eastwood</li>
-        <li>Tiendesitas</li>
-        <li>Arcovia</li>
-    </ul>
+    {% for branch in branch_list %}
+    <li><a href="branchdetails?code={{ branch["code"] }}">
+        {{ branch["name"] }}
+    </a>
+    {% endfor %}
+</ul>
 {% include "footer.html" %}

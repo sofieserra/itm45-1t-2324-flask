@@ -33,7 +33,15 @@ def productdetails():
 
 @app.route('/branches')
 def branches():
-    return render_template('branches.html', page="Branches")
+    branch_list = db.get_branches()
+    return render_template('branches.html', page = "Branches", branch_list = branch_list)
+
+@app.route('/branchdetails')
+def branchdetails():
+    code = request.args.get('code', '')
+    branch = db.get_branch(int(code))
+
+    return render_template('branchdetails.html', code = code, branch = branch)
 
 @app.route('/aboutus')
 def aboutus():
@@ -79,6 +87,7 @@ def addtocart():
     item["qty"] = 1
     item["name"] = product["name"]
     item["subtotal"] = product["price"]*item["qty"]
+    item["code"] = code
 
     if(session.get("cart") is None):
         session["cart"]={}
@@ -92,20 +101,36 @@ def addtocart():
 def cart():
     return render_template('cart.html')
     
-@app.route('/updatecart', methods=['POST'])
+@app.route('/updatecart')
 def updatecart():
-    if 'cart' in session and request.method == 'POST':
-        cart = session["cart"]
+    return render_template('updatecart.html')
+
+@app.route('/updatecartsubmission', methods = ['GET', 'POST'])
+def updatecartsubmission():
+    cart = session["cart"]
+    code = list(cart.keys())
+    qty = request.form.getlist("qty")
+    qty = list(map(int, qty))
+
+    for index, x in enumerate(qty):
+        product = db.get_product(int(code[index]))
+        cart[code[index]]["qty"] = qty[index]
+        cart[code[index]]["subtotal"] = qty[index] * product["price"]
         
-        code = request.form.get('code')
-        qty = int(request.form.get('quantity_' + code))  # Adjust this line to match the input name
+    print(cart)
+    session["cart"] = cart
+    return redirect('/cart')
 
-        if code in cart:
-            product = db.get_product(int(code))
-            cart[code]["qty"] = qty
-            cart[code]["subtotal"] = qty * product["price"]
-            session["cart"] = cart
-
+@app.route('/removeproduct')
+def removeproduct():
+    code = request.args.get('code', '')
+    cart = session["cart"]
+    print(code)
+    try:
+        del cart[code]
+    except:
+        print("code is: ",code)
+    session["cart"] = cart
     return redirect('/cart')
 
 
