@@ -2,7 +2,7 @@
     <h1>Branches</h1>
     <ul>
     {% for branch in branch_list %}
-    <li><a href="branchdetails?code={{ branch["code"] }}">
+    <li><a href="{{ url_for('branch_details', code=branch['code']) }}">
         {{ branch["name"] }}
     </a>
     {% endfor %}

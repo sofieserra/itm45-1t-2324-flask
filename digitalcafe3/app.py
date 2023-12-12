@@ -1,4 +1,4 @@
-from flask import Flask,redirect
+from flask import Flask,redirect,flash,url_for
 from flask import render_template
 from flask import request
 from flask import session
@@ -37,12 +37,10 @@ def branches():
     branch_list = db.get_branches()
     return render_template('branches.html', page = "Branches", branch_list = branch_list)
 
-@app.route('/branchdetails')
-def branchdetails():
-    code = request.args.get('code', '')
-    branch = db.get_branch(int(code))
-
-    return render_template('branchdetails.html', code = code, branch = branch)
+@app.route('/branch_details/<int:code>')
+def branch_details(code):
+    branch = db.get_branch(code)
+    return render_template('branchdetails.html', branch=branch)
 
 @app.route('/aboutus')
 def aboutus():
@@ -145,3 +143,39 @@ def checkout():
 def ordercomplete():
     return render_template('ordercomplete.html')
 
+@app.route('/past_orders')
+def past_orders():
+    username = session.get("user")["username"]
+    past_orders = db.get_past_orders(username)
+    if past_orders is None:
+        past_orders = []
+    return render_template('pastorders.html', page="Past Orders", past_orders=past_orders)
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if 'user' not in session:
+      
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        old_password = request.form.get('old_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+       
+        username = session['user']['username']
+
+     
+        is_valid_login, user = authentication.login(username, old_password)
+
+        if not is_valid_login:
+            flash('Incorrect old password. Please try again.', 'error')
+        elif new_password != confirm_password:
+            flash('New password and confirmation do not match. Please try again.', 'error')
+        else:
+          
+            db.update_password(username, new_password)
+            flash('Password updated successfully!', 'success')
+            return redirect(url_for('index'))
+
+    return render_template('change_password.html', page="Change Password")

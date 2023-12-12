@@ -5,6 +5,8 @@ myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 products_db = myclient["products"]
 order_management_db = myclient["order_management"]
 
+from datetime import datetime
+
 branches = {
     1: {"name":"Katipunan","phonenumber":"09179990000"},
     2: {"name":"Tomas Morato","phonenumber":"09179990001"},
@@ -35,7 +37,7 @@ def get_branch(code):
 
     branches = branches_coll.find_one({"code":code})
  
-    return branches[code]
+    return branches
 
 def get_branches():
     branch_list = []
@@ -55,3 +57,22 @@ def get_user(username):
 def create_order(order):
     orders_coll = order_management_db['orders']
     orders_coll.insert(order)
+
+def get_past_orders(username):
+    orders_coll = order_management_db['orders']
+
+    past_orders_cursor = orders_coll.find({"username": username}).sort("orderdate", -1)
+
+    past_orders = []
+
+    for order in past_orders_cursor:
+       
+        order['orderdate'] = order['orderdate'].strftime('%Y-%m-%d %H:%M:%S')
+
+        past_orders.append(order)
+
+    return past_orders
+
+def update_password(username, new_password):
+    customers_coll = order_management_db['customers']
+    customers_coll.update_one({'username': username}, {'$set': {'password': new_password}})
